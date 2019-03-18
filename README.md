@@ -12,7 +12,9 @@ latest versions of prometheus/prometheus: [2.7.2 2.6.1 2.5.0 2.4.3 2.3.2 2.2.1]
 ```
 
 ## usage
-`listVersions <repo>/<release>,min_version`
+`listVersions <repo>/<release>,<min_version>`
+for example:
+`listVersions kubernetes/kubernetes,1.8.0`
 
 ## test
 test cases are documented in `main_test.go`, which can be run by `go test`
