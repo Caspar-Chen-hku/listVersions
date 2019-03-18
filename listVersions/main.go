@@ -37,30 +37,35 @@ func LatestVersions(releases []*semver.Version, minVersion *semver.Version) []*s
 	return versionSlice
 }
 
+func parseArg() (string, string, string){
+	arg := os.Args[1]
+	//target[0]: repo/release; target[1]: min_version
+	var target = strings.Split(arg, ",")
+	//app[0]: repo; app[1]: release
+	var app = strings.Split(target[0],"/")
+	return app[0], app[1], target[1]
+} 
+
 // Here we implement the basics of communicating with github through the library as well as printing the version
 // You will need to implement LatestVersions function as well as make this application support the file format outlined in the README
 // Please use the format defined by the fmt.Printf line at the bottom, as we will define a passing coding challenge as one that outputs
 // the correct information, including this line
 func main() {
 	// Github
-	arg := os.Args[1]
-	//target[0]: repo/release; target[1]: min_version
-	var target = strings.Split(arg, ",")
 
-	//app[0]: repo; app[1]: release
-	var app = strings.Split(target[0],"/")
+	repo, rel, min_ver = parseArg()
 
 	client := github.NewClient(nil)
 	ctx := context.Background()
 	opt := &github.ListOptions{PerPage: 10}
-	releases, _, err := client.Repositories.ListReleases(ctx, app[0], app[1], opt)
+	releases, _, err := client.Repositories.ListReleases(ctx, repo, rel, opt)
 	if err != nil {
 		//panic should only be used when some fatal error happens, and everything
 		//should crash immediately. It's better to avoid using panic
 		fmt.Print(err)
 		//panic(err) // is this really a good way?
 	}
-	minVersion := semver.New(target[1])
+	minVersion := semver.New(min_ver)
 	allReleases := make([]*semver.Version, len(releases))
 	for i, release := range releases {
 		versionString := *release.TagName
@@ -71,5 +76,5 @@ func main() {
 	}
 	versionSlice := LatestVersions(allReleases, minVersion)
 
-	fmt.Printf("latest versions of %s/%s: %s", app[0], app[1], versionSlice)
+	fmt.Printf("latest versions of %s/%s: %s", repo, rel, versionSlice)
 }
