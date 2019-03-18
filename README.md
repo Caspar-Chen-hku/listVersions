@@ -18,7 +18,9 @@ latest versions of prometheus/prometheus: [2.7.2 2.6.1 2.5.0 2.4.3 2.3.2 2.2.1]
 
 ## usage
 
-`listVersions <repo>/<release>,<min_version>`
+1. run `go build` to build it, obtaining an executable `listVersions.exe`
+
+2. run `listVersions <repo>/<release>,<min_version>`
 
 for example:
 
