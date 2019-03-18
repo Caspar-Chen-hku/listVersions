@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"os"
+	"strings"
 
 	"github.com/coreos/go-semver/semver"
 	"github.com/google/go-github/github"
@@ -41,17 +43,24 @@ func LatestVersions(releases []*semver.Version, minVersion *semver.Version) []*s
 // the correct information, including this line
 func main() {
 	// Github
+	arg := os.Args[1]
+	//target[0]: repo/release; target[1]: min_version
+	var target = strings.Split(arg, ",")
+
+	//app[0]: repo; app[1]: release
+	var app = strings.Split(target[0],"/")
+
 	client := github.NewClient(nil)
 	ctx := context.Background()
 	opt := &github.ListOptions{PerPage: 10}
-	releases, _, err := client.Repositories.ListReleases(ctx, "kubernetes", "kubernetes", opt)
+	releases, _, err := client.Repositories.ListReleases(ctx, app[0], app[1], opt)
 	if err != nil {
 		//panic should only be used when some fatal error happens, and everything
 		//should crash immediately. It's better to avoid using panic
 		fmt.Print(err)
 		//panic(err) // is this really a good way?
 	}
-	minVersion := semver.New("1.8.0")
+	minVersion := semver.New(target[1])
 	allReleases := make([]*semver.Version, len(releases))
 	for i, release := range releases {
 		versionString := *release.TagName
@@ -62,5 +71,5 @@ func main() {
 	}
 	versionSlice := LatestVersions(allReleases, minVersion)
 
-	fmt.Printf("latest versions of kubernetes/kubernetes: %s", versionSlice)
+	fmt.Printf("latest versions of %s/%s: %s", app[0], app[1], versionSlice)
 }
